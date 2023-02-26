@@ -30,8 +30,12 @@ export class TracksService implements OnModuleInit {
     return this.trackCircularList.toArray();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} track`;
+  addTrackToQueue(trackName: string) {
+    const lastTrack = this.trackCircularList.last.value;
+    return this.trackCircularList.append({
+      position: lastTrack.position + 1,
+      songName: trackName,
+    }).last.value;
   }
 
   findNext(idx: number) {

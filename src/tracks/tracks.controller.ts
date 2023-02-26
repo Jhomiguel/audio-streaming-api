@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { Request, Response } from 'express';
 
@@ -11,9 +11,9 @@ export class TracksController {
     return this.tracksService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tracksService.findOne(+id);
+  @Post('queue')
+  findOne(@Body() track) {
+    return this.tracksService.addTrackToQueue(track.name);
   }
 
   @Get('/next/:idx')
@@ -27,6 +27,6 @@ export class TracksController {
     @Res() res: Response,
     @Param('trackId') key: string,
   ) {
-    this.tracksService.streamTrack(key, req, res);
+    return this.tracksService.streamTrack(key, req, res);
   }
 }
