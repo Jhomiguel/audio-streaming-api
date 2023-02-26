@@ -7,44 +7,36 @@ import { Request, Response } from 'express';
 import { ReadStream, Stats } from 'fs';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Circular } from 'src/util/circular';
+import { TracksStorage } from 'src/tracks/tracks-storage.service';
 
 @Injectable()
 export class TracksService implements OnModuleInit {
-  constructor(private trackCircularList: Circular) {}
+  constructor(private trackStorage: TracksStorage) {}
 
-  async onModuleInit() {
+  onModuleInit() {
+    this.saveTracksOnStorage();
+  }
+
+  private saveTracksOnStorage() {
     const tracksDir = path.join(
       `${process.cwd()}/audio-streaming/../public/assets/audio/tracks`,
     );
 
-    fs.readdir(tracksDir, (err, files) => {
+    fs.readdir(tracksDir, (_, files) => {
       files.forEach((file, i) => {
         const trackName = file.split('.')[0];
-        this.trackCircularList.append({ position: i, songName: trackName });
+        this.trackStorage.append({ position: i, songName: trackName });
       });
     });
   }
 
   findAll() {
-    return this.trackCircularList.toArray();
-  }
-
-  addTrackToQueue(trackName: string) {
-    const lastTrack = this.trackCircularList.last.value;
-    return this.trackCircularList.append({
-      position: lastTrack.position + 1,
-      songName: trackName,
-    }).last.value;
-  }
-
-  findNext(idx: number) {
-    return this.trackCircularList.get(idx).next.value;
+    return this.trackStorage.toArray();
   }
 
   async streamTrack(key: string, req: Request, res: Response) {
     const musicPath = path.join(
-      `${process.cwd()}/audio-streaming/../public/assets/audio/tracks/${key}.mp3`,
+      `${process.cwd()}/public/assets/audio/tracks/${key}.mp3`,
     );
 
     let stat: Stats;

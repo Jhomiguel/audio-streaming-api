@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { List } from './list';
 import { Node } from './node';
 
-@Injectable()
 export class Circular extends List {
   _head;
   _last;
@@ -78,7 +76,7 @@ export class Circular extends List {
     prev.next = next;
     next.prev = prev;
     this._length--;
-    return this;
+    return node;
   }
 
   append(...values) {

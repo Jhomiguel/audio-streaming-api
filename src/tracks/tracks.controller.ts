@@ -11,16 +11,6 @@ export class TracksController {
     return this.tracksService.findAll();
   }
 
-  @Post('queue')
-  findOne(@Body() track) {
-    return this.tracksService.addTrackToQueue(track.name);
-  }
-
-  @Get('/next/:idx')
-  findNext(@Param('idx') idx: string) {
-    return this.tracksService.findNext(+idx);
-  }
-
   @Get('stream/:trackId')
   streamTrack(
     @Req() req: Request,
