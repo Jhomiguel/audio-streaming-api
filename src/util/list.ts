@@ -78,7 +78,7 @@ export class List {
 
   node(index) {
     if (!this._isValid(index)) {
-      throw new RangeError('List index out of bounds');
+      return null;
     }
 
     if (index < this.length / 2) {

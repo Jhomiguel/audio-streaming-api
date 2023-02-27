@@ -222,7 +222,7 @@ export class Circular extends List {
 
   remove(index) {
     if (!this._isValid(index)) {
-      throw new RangeError('List index out of bounds');
+      return null;
     }
 
     if (index === 0) {

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { TracksQueueStorage } from './tracks-queue-storage.service';
 
 @Injectable()
@@ -7,10 +8,8 @@ export class TracksQueueService {
 
   addTrackToQueue(payload) {
     const { name } = payload;
-    const lastTrack = this.tracksQueueStorage.last?.value;
 
     return this.tracksQueueStorage.append({
-      position: lastTrack ? lastTrack.position + 1 : 0,
       songName: name,
     }).last.value;
   }
@@ -20,10 +19,30 @@ export class TracksQueueService {
   }
 
   findNext(idx: number) {
-    return this.tracksQueueStorage.get(idx).next.value;
+    const track = this.findTrack(idx);
+    return track.next.value;
   }
 
   findPrevious(idx: number) {
-    return this.tracksQueueStorage.get(idx - 1).next.value;
+    const track = this.findTrack(idx);
+    return track.prev.value;
+  }
+
+  findTrack(idx: number) {
+    const track = this.tracksQueueStorage.get(idx);
+
+    if (!track)
+      throw new NotFoundException(`Unable to get track on position: ${idx}`);
+
+    return track;
+  }
+
+  removeTrack(idx: number) {
+    const removed = this.tracksQueueStorage.remove(idx);
+
+    if (!removed)
+      throw new NotFoundException(`Unable to remove track on position: ${idx}`);
+
+    return removed?.value;
   }
 }

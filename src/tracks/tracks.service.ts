@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { ReadStream, Stats } from 'fs';
 import * as fs from 'fs';
@@ -11,21 +12,22 @@ import { TracksStorage } from 'src/tracks/tracks-storage.service';
 
 @Injectable()
 export class TracksService implements OnModuleInit {
-  constructor(private trackStorage: TracksStorage) {}
+  constructor(
+    private readonly trackStorage: TracksStorage,
+    private readonly configService: ConfigService,
+  ) {}
 
   onModuleInit() {
     this.saveTracksOnStorage();
   }
 
   private saveTracksOnStorage() {
-    const tracksDir = path.join(
-      `${process.cwd()}/audio-streaming/../public/assets/audio/tracks`,
-    );
+    const tracksDir = path.join(this.configService.get<string>('TRACKS_PATH'));
 
     fs.readdir(tracksDir, (_, files) => {
       files.forEach((file, i) => {
         const trackName = file.split('.')[0];
-        this.trackStorage.append({ position: i, songName: trackName });
+        this.trackStorage.append({ songName: trackName });
       });
     });
   }
@@ -36,7 +38,7 @@ export class TracksService implements OnModuleInit {
 
   async streamTrack(key: string, req: Request, res: Response) {
     const musicPath = path.join(
-      `${process.cwd()}/public/assets/audio/tracks/${key}.mp3`,
+      `${this.configService.get<string>('TRACKS_PATH')}/${key}.mp3`,
     );
 
     let stat: Stats;

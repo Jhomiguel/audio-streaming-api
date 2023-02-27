@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Delete } from '@nestjs/common/decorators';
 import { TracksQueueService } from './tracks-queue.service';
 
 @Controller('tracks-queue')
@@ -23,5 +24,10 @@ export class TracksQueueController {
   @Get('/prev/:idx')
   findPrevious(@Param('idx') idx: string) {
     return this.tracksQueueService.findPrevious(+idx);
+  }
+
+  @Delete('/:id')
+  removeTrack(@Param('id') id: string) {
+    return this.tracksQueueService.removeTrack(+id);
   }
 }
